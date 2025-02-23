@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <!-- Adiciona ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-title">
+                <h1>Web3 Dashboard</h1>
+            </div>
+            <div class="header-tools">
+                <button id="themeToggle" class="tool-button" title="Alternar Tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Sidebar com Widget da Carteira -->
+            <div class="sidebar">
+                <div class="wallet-widget">
+                    <div class="widget-header">
+                        <h2>Carteira</h2>
+                    </div>
+                    <div class="wallet-container">
+                        <button id="connectWallet">Conectar Metamask</button>
+                        <div id="walletInfo" class="hidden">
+                            <div class="loading-container" id="addressLoading">
+                                <div class="loading-spinner"></div>
+                                <p>Conectando carteira...</p>
+                            </div>
+                            <p class="hidden" id="addressInfo">Endereço: <span id="walletAddress"></span></p>
+                            <div id="balances">
+                                <div class="loading-container" id="balanceLoading">
+                                    <div class="loading-spinner"></div>
+                                    <p>Carregando saldos...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Area -->
+            <div class="main-content">
+                <div class="widgets-grid">
+                    <div class="task-widget">
+                        <div class="widget-header">
+                            <h2>Lista de Tarefas</h2>
+                            <button id="addTaskButton" class="add-button">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="task-list" id="taskList">
+                            <!-- As tarefas serão inseridas aqui dinamicamente -->
+                        </div>
+                    </div>
+                    <div class="reminders-widget">
+                        <div class="widget-header">
+                            <h2>Lembretes</h2>
+                            <div class="widget-actions">
+                                <button id="addReminderButton" class="add-button" title="Novo lembrete">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button id="viewAllReminders" class="view-all-button" title="Ver todos">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="reminders-carousel">
+                            <!-- Lembretes serão inseridos aqui dinamicamente -->
+                        </div>
+                    </div>
+                    <div class="tools-widget">
+                        <div class="widget-header">
+                            <h2>Ferramentas</h2>
+                            <button id="addToolButton" class="add-button" title="Adicionar ferramenta">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="tools-grid" id="toolsGrid">
+                            <!-- Ferramentas serão inseridas aqui dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para adicionar tarefa -->
+                <div id="addTaskModal" class="modal hidden">
+                    <div class="modal-content">
+                        <h2>Adicionar Tarefa</h2>
+                        <div class="modal-body">
+                            <div class="input-group">
+                                <label for="taskTitle">Título:</label>
+                                <input type="text" id="taskTitle" placeholder="Digite o título da tarefa">
+                            </div>
+                            <div class="input-group">
+                                <label for="taskLink">Link (opcional):</label>
+                                <input type="url" id="taskLink" placeholder="https://...">
+                            </div>
+                            <div class="input-group">
+                                <label for="taskIcon">Ícone:</label>
+                                <select id="taskIcon">
+                                    <option value="fa-link">🔗 Link</option>
+                                    <option value="fa-book">📚 Documentação</option>
+                                    <option value="fa-code">💻 Código</option>
+                                    <option value="fa-video">🎥 Vídeo</option>
+                                    <option value="fa-file">📄 Arquivo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancelAddTask">Cancelar</button>
+                            <button id="confirmAddTask">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para adicionar lembrete -->
+                <div id="addReminderModal" class="modal hidden">
+                    <div class="modal-content">
+                        <h2>Novo Lembrete</h2>
+                        <div class="modal-body">
+                            <div class="input-group">
+                                <label for="reminderTitle">Título:</label>
+                                <input type="text" id="reminderTitle" placeholder="Digite o título do lembrete">
+                            </div>
+                            <div class="input-group">
+                                <label for="reminderDate">Data:</label>
+                                <input type="datetime-local" id="reminderDate">
+                            </div>
+                            <div class="input-group">
+                                <label for="reminderPriority">Prioridade:</label>
+                                <select id="reminderPriority">
+                                    <option value="low">Baixa</option>
+                                    <option value="medium">Média</option>
+                                    <option value="high">Alta</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancelAddReminder">Cancelar</button>
+                            <button id="confirmAddReminder">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para adicionar ferramenta -->
+                <div id="addToolModal" class="modal hidden">
+                    <div class="modal-content">
+                        <h2>Nova Ferramenta</h2>
+                        <div class="modal-body">
+                            <div class="input-group">
+                                <label for="toolTitle">Título:</label>
+                                <input type="text" id="toolTitle" placeholder="Nome da ferramenta">
+                            </div>
+                            <div class="input-group">
+                                <label for="toolUrl">URL:</label>
+                                <input type="url" id="toolUrl" placeholder="https://...">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancelAddTool">Cancelar</button>
+                            <button id="confirmAddTool">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar token -->
+    <div id="addTokenModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Adicionar Token</h2>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="tokenAddress">Endereço do Contrato:</label>
+                    <input type="text" id="tokenAddress" placeholder="0x...">
+                </div>
+                <div class="token-preview hidden">
+                    <p>Nome: <span id="tokenName"></span></p>
+                    <p>Símbolo: <span id="tokenSymbol"></span></p>
+                    <p>Decimais: <span id="tokenDecimals"></span></p>
+                </div>
+                <div class="error-message hidden"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelAddToken">Cancelar</button>
+                <button id="confirmAddToken" disabled>Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
